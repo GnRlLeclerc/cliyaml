@@ -1,0 +1,16 @@
+# An example configuration
+
+string: "string"
+int: 0
+float: 0.0
+
+# docstring
+docstring: "value"
+
+bool: # bool
+
+empty: # int
+
+nested:
+  one: 1
+  two: 2
