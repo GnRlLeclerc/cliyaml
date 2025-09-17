@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from types import NoneType
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Type, TypeAlias, TypeVar
 
 import regexp
 
@@ -12,8 +12,12 @@ T = TypeVar("T")
 @dataclass
 class Value(Generic[T]):
     value: T
-    type: type
-    comment: str
+    type: Type[T]
+    comment: str | None = None
+
+
+Tree: TypeAlias = dict[str, "Node"]
+Node: TypeAlias = Value[int | float | str | bool | None | Tree]
 
 
 def parse_value(s: str) -> tuple[Any, type]:
@@ -66,31 +70,41 @@ def parse_value(s: str) -> tuple[Any, type]:
     return (value, val_type)
 
 
-def parse_lines(lines: list[str], indent=0, offset=0) -> tuple[dict, int]:
+def parse_lines(lines: list[str], indent=0, offset=0) -> tuple[Tree, int]:
     """Parse lines starting from the given offset, and at the given indentation level.
 
     If encountering higher indentation, parse the nested structure recursively.
     If encountering lower indentation, return the current data and offset for the caller to handle.
     """
 
-    data = {}
+    data: Tree = {}
     key = ""
+    comments: list[str] = []
 
     while offset < len(lines):
         line_indent = (len(lines[offset]) - len(lines[offset].lstrip())) // 2
+        line = lines[offset].strip()
 
-        if lines[offset].strip() == "" or lines[offset].strip().startswith("#"):
+        if line.startswith("#"):
+            comments.append(line[1:].strip())
+            offset += 1
+            continue
+
+        if line == "":
+            comments = []
             offset += 1
             continue
 
         if line_indent == indent:
-            key = lines[offset].split(":")[0].strip()
-            value = parse_value(lines[offset][len(key) + 1 + indent * 2 :].strip())
-            data[key] = value
+            key = line.split(":")[0].strip()
+            value, type = parse_value(line[len(key) + 1 :].strip())
+            data[key] = Value(value, type, "\n".join(comments))
+            comments = []
 
         if line_indent > indent:
             child, offset = parse_lines(lines, line_indent, offset)
-            data[key] = child
+            data[key] = Value(child, dict, "\n".join(comments))
+            comments = []
 
         if line_indent < indent:
             break
