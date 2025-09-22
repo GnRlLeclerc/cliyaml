@@ -11,3 +11,9 @@ uv build
 ## Publish
 
 TODO
+
+## Test
+
+```bash
+pytest
+```

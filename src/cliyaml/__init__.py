@@ -3,6 +3,7 @@
 # TODO :
 # - override a config file with another config file ? (see how to merge trees ?) -> maybe not needed
 # - call functions with only the needed arguments (helper to go faster)
+# - register functions with decorators to be called as subcommands
 # - auto register subcommands (importlib, could be cool)
 
 from cliyaml.cli import build
