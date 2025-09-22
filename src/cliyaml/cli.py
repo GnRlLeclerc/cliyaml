@@ -2,7 +2,7 @@
 
 import argparse
 
-from parse import Tree
+from cliyaml.parse import Tree
 
 
 def build(tree: Tree, description: str = "") -> argparse.ArgumentParser:

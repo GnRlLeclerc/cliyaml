@@ -2,8 +2,25 @@
 name = "cliyaml"
 version = "0.1.0"
 description = "Prototype projects fast with YAML configuration"
+authors = [{ name = "Thibaut de Saivre", email = "thibaut2saivre@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+
+license = "MIT"
+license-files = ["LICENSE*"]
+
+[project.urls]
+Homepage = "https://github.com/GnRlLeclerc/cliyaml"
+
+[build-system]
+requires = ["uv_build >= 0.8.17, <0.9.0"]
+build-backend = "uv_build"
+
 
 [tool.ruff.format]

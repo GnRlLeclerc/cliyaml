@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from types import NoneType
 from typing import Any, Generic, Type, TypeAlias, TypeVar
 
-import regexp
+from cliyaml import regexp
 
 T = TypeVar("T")
 
