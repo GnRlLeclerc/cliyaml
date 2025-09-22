@@ -19,6 +19,19 @@ def configure(file: str):
     return build(data, parse_description(lines))
 
 
+def override(base: dict, new: dict) -> dict:
+    """Deeply override values from a base dict with values from another dict.
+    Done in place for the base dict."""
+
+    for key, value in new.items():
+        if "key" in base and isinstance(base[key], dict) and isinstance(new[key], dict):
+            override(base[key], new[key])
+        else:
+            base[key] = value
+
+    return base
+
+
 # TODO : easily configure subcommands in subfiles ?
 # like, auto import files in the script folder, and they define functions with a decorator that runs
 # and registers the subcommand
