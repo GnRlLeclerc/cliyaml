@@ -1,12 +1,10 @@
-"""Prototype projects fast with YAML configuration"""
+"""Prototype projects fast with YAML configuration, and some additional utilities."""
 
-# TODO :
-# - call functions with only the needed arguments (helper to go faster)
-# - register functions with decorators to be called as subcommands
-# - auto register subcommands (importlib, could be cool)
-
+import importlib
+import inspect
 from argparse import ArgumentParser
-from typing import Any
+from pathlib import Path
+from typing import Any, Callable, ParamSpec, TypeVar
 
 from cliyaml.cli import add_to_parser, build
 from cliyaml.parse import parse_description, parse_lines
@@ -19,7 +17,7 @@ __parser__: ArgumentParser | None = None
 __subparser__: Any = None
 
 
-def initialize(parser: ArgumentParser | None = None):
+def initialize(parser: ArgumentParser | None = None, *paths: str):
     """Initialize the main argument parser"""
     global __parser__, __subparser__
 
@@ -29,6 +27,15 @@ def initialize(parser: ArgumentParser | None = None):
         __parser__ = parser
 
     __subparser__ = __parser__.add_subparsers(help="Subcommands", dest="subcommand")
+
+    # Import all python files under the specified paths to register subcommands automatically
+    for path_str in paths:
+        path = Path(path_str)
+        if path.is_file():
+            importlib.import_module(path.stem)
+        else:
+            for file in path.rglob("*.py"):
+                importlib.import_module(str(file))
 
 
 def configure(file: str):
@@ -89,6 +96,20 @@ def override(base: dict, new: dict) -> dict:
             base[key] = value
 
     return base
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def call(func: Callable[P, R], d: dict, *args: P.args, **kwargs: P.kwargs) -> R:
+    """Call a function with the exact arguments it needs from a dict.
+    Arguments can be manually specified as well."""
+    merged = d | kwargs
+    sig = inspect.signature(func)
+    filtered_kwargs = {k: v for k, v in merged.items() if k in sig.parameters}
+
+    return func(*args, **filtered_kwargs)
 
 
 if __name__ == "__main__":
