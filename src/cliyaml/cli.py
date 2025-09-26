@@ -5,13 +5,6 @@ import argparse
 from cliyaml.parse import Tree
 
 
-def build(tree: Tree, description: str = "") -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=description)
-    add_to_parser(parser, tree)
-
-    return parser
-
-
 def add_to_parser(
     parser: argparse.ArgumentParser, tree: Tree, prefix="", prefix_shorthand=""
 ):

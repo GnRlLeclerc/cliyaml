@@ -57,6 +57,7 @@ Define some scripts in separate files, for instance in a `scripts/` folder.
 ```python
 from cliyaml import subcommand
 
+# NOTE: multiple different files can be specified to extend the configuration
 @subcommand("config.yaml")
 def main(**kwargs):
     print("Called with args:", kwargs)

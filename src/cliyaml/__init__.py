@@ -4,8 +4,8 @@ import inspect
 from argparse import ArgumentParser
 from typing import Any, Callable, ParamSpec, TypeVar
 
-from cliyaml.cli import add_to_parser, build
-from cliyaml.parse import parse_description, parse_lines, to_dict
+from cliyaml.cli import add_to_parser
+from cliyaml.parse import Tree, parse_description, parse_lines, to_dict
 from cliyaml.source import source
 
 # Registered commands
@@ -31,20 +31,44 @@ def initialize(parser: ArgumentParser | None = None, *paths: str):
     source(*paths)
 
 
-def configure(file: str):
-    with open(file, "r") as f:
-        content = f.read()
-    lines = content.splitlines()
-    data, _ = parse_lines(lines)
+def _merge_trees(base: Tree, new: Tree) -> Tree:
+    """Recursively merge two YAML trees in a type-safe way"""
 
-    return build(data, parse_description(lines))
+    for key, new_node in new.items():
+        if key in base:
+            base_node = base[key]
+            if base_node.type == dict and new_node.type == dict:
+                assert isinstance(base_node.value, dict)
+                assert isinstance(new_node.value, dict)
+                _merge_trees(base_node.value, new_node.value)
+            elif base_node.type == new_node.type:
+                base[key] = new_node
+            else:
+                raise TypeError(
+                    f"Type mismatch for key '{key}': {base_node.type} vs {new_node.type}"
+                )
+        else:
+            base[key] = new_node
+    return base
 
 
-def subcommand(file: str):
+def subcommand(*files: str):
     """Register a function as a subcommand, with config taken from the specified file"""
 
-    with open(file, "r") as f:
-        lines = f.readlines()
+    tree: Tree = {}
+    description = ""
+
+    for file in files:
+        with open(file, "r") as f:
+            lines = f.readlines()
+
+        description = parse_description(lines)
+        new_tree, _ = parse_lines(lines)
+
+        if not tree:
+            tree = new_tree
+        else:
+            tree = _merge_trees(tree, new_tree)
 
     def decorator(func):
         if __parser__ is None:
@@ -53,8 +77,7 @@ def subcommand(file: str):
             )
 
         __commands__[func.__name__] = func
-        parser = __subparser__.add_parser(func.__name__, help=parse_description(lines))
-        tree, _ = parse_lines(lines)
+        parser = __subparser__.add_parser(func.__name__, help=description)
         add_to_parser(parser, tree)
         parser.add_argument(
             "-c",
