@@ -20,7 +20,7 @@ Basically:
 This packages relies on YAML for configuration due to its readability, however it only parses a subset of it.
 Here is what it looks like.
 
-[`config.yaml`](./config.yaml)
+[`config.yaml`](./tests/config.yaml)
 
 ```yaml
 # An example configuration
@@ -96,14 +96,12 @@ uv build
 
 ## Publish
 
-TODO
+```bash
+uv publish
+```
 
 ## Test
 
 ```bash
 pytest
 ```
-
-## Roadmap
-
-- [ ] Specify multiple config files in `@subcommand` to override / expand existing ones
