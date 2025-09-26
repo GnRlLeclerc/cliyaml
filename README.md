@@ -84,6 +84,9 @@ python main.py main -h
 python main.py main
 ```
 
+You can also use `cliyaml.call()` to call a function by giving it `kwargs` directly, it will only pass the correct arguments.
+This function also allows you to pass named and list arguments to override the `kwargs`.
+
 ## Building
 
 ```bash
@@ -102,5 +105,4 @@ pytest
 
 ## Roadmap
 
-- [ ] Type & Key checking when overriding configs using `--config`
 - [ ] Specify multiple config files in `@subcommand` to override / expand existing ones

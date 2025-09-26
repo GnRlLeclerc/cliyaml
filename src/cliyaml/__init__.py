@@ -93,22 +93,20 @@ def handle():
     del args.config  # type: ignore
     del args.subcommand  # type: ignore
 
-    kwargs = vars(args) | additional
+    # Override args only if types are compatible
+    kwargs = vars(args)
+    for key, value in additional.items():
+        if key not in kwargs:
+            raise KeyError(f"Extra option passed '{key}' in override config file")
+        base = kwargs[key]
+        if type(value) == type(base) or base is None or value is None:
+            kwargs[key] = value
+        else:
+            raise TypeError(
+                f"Type mismatch for option '{key}': expected {type(base)}, got {type(value)}"
+            )
 
     __commands__[subcommand](**kwargs)
-
-
-def override(base: dict, new: dict) -> dict:
-    """Deeply override values from a base dict with values from another dict.
-    Done in place for the base dict."""
-
-    for key, value in new.items():
-        if "key" in base and isinstance(base[key], dict) and isinstance(new[key], dict):
-            override(base[key], new[key])
-        else:
-            base[key] = value
-
-    return base
 
 
 P = ParamSpec("P")
