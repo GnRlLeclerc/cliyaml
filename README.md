@@ -17,7 +17,36 @@ Basically:
 
 ### YAML subset
 
-TODO
+This packages relies on YAML for configuration due to its readability, however it only parses a subset of it.
+Here is what it looks like.
+
+[`config.yaml`](./config.yaml)
+
+```yaml
+# An example configuration
+
+string: "string"
+int: 0
+float: 0.0
+
+# docstring
+docstring: "value"
+
+bool: true
+
+empty: # int
+
+nested:
+  one: 1
+  two: 2
+```
+
+- the top comments are the subcommand's description
+- comments before a value are its docstring
+- only `true` and `false` are valid booleans
+- type hints can be specified for null values with an inline comment
+- no lists
+- nested values are flattened into a flat python dict, with keys joined by `_`
 
 ### CLI API
 

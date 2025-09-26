@@ -7,7 +7,7 @@ float: 0.0
 # docstring
 docstring: "value"
 
-bool: # bool
+bool: true
 
 empty: # int
 
