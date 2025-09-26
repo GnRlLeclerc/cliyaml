@@ -26,6 +26,4 @@ build-backend = "uv_build"
 [tool.ruff.format]
 
 [dependency-groups]
-dev = [
-    "pytest>=8.4.2",
-]
+dev = ["pytest>=8.4.2"]

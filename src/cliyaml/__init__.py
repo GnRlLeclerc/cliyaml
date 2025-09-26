@@ -1,13 +1,12 @@
 """Prototype projects fast with YAML configuration, and some additional utilities."""
 
-import importlib
 import inspect
 from argparse import ArgumentParser
-from pathlib import Path
 from typing import Any, Callable, ParamSpec, TypeVar
 
 from cliyaml.cli import add_to_parser, build
 from cliyaml.parse import parse_description, parse_lines
+from cliyaml.source import source
 
 # Registered commands
 __commands__ = {}
@@ -29,13 +28,7 @@ def initialize(parser: ArgumentParser | None = None, *paths: str):
     __subparser__ = __parser__.add_subparsers(help="Subcommands", dest="subcommand")
 
     # Import all python files under the specified paths to register subcommands automatically
-    for path_str in paths:
-        path = Path(path_str)
-        if path.is_file():
-            importlib.import_module(path.stem)
-        else:
-            for file in path.rglob("*.py"):
-                importlib.import_module(str(file))
+    source(*paths)
 
 
 def configure(file: str):
@@ -110,13 +103,3 @@ def call(func: Callable[P, R], d: dict, *args: P.args, **kwargs: P.kwargs) -> R:
     filtered_kwargs = {k: v for k, v in merged.items() if k in sig.parameters}
 
     return func(*args, **filtered_kwargs)
-
-
-if __name__ == "__main__":
-    initialize()
-
-    @subcommand("config.yaml")
-    def f(**_):
-        print("ok")
-
-    handle()
