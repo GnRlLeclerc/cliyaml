@@ -124,3 +124,18 @@ def parse_description(lines: list[str]) -> str:
         else:
             break
     return "\n".join(description_lines)
+
+
+def to_dict(tree: Tree, prefix="") -> dict:
+    """Convert a Tree to a flattened directory."""
+
+    result = {}
+
+    for key, node in tree.items():
+        if isinstance(node.value, dict):
+            d = to_dict(node.value, f"{prefix}{key}_")
+            result |= d
+        else:
+            result[f"{prefix}{key}"] = node.value
+
+    return result

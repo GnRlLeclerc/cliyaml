@@ -18,7 +18,7 @@ def add_to_parser(
     """Recursively traverse the tree and add arguments to the parser."""
 
     prefix_shorthands = set()
-    shorthands = set()
+    shorthands = {"c"} if prefix == "" else set()
 
     for key, value in tree.items():
         if isinstance(value.value, dict):

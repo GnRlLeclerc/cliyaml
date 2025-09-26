@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from typing import Any, Callable, ParamSpec, TypeVar
 
 from cliyaml.cli import add_to_parser, build
-from cliyaml.parse import parse_description, parse_lines
+from cliyaml.parse import parse_description, parse_lines, to_dict
 from cliyaml.source import source
 
 # Registered commands
@@ -56,6 +56,12 @@ def subcommand(file: str):
         parser = __subparser__.add_parser(func.__name__, help=parse_description(lines))
         tree, _ = parse_lines(lines)
         add_to_parser(parser, tree)
+        parser.add_argument(
+            "-c",
+            "--config",
+            type=str,
+            help="Path to a YAML config file to override default values",
+        )
 
     return decorator
 
@@ -74,8 +80,22 @@ def handle():
     if subcommand is None:
         return
 
+    if args.config is not None:
+        with open(args.config, "r") as f:
+            content = f.read()
+        lines = content.splitlines()
+        data, _ = parse_lines(lines)
+
+        additional = to_dict(data)
+    else:
+        additional = {}
+
+    del args.config  # type: ignore
     del args.subcommand  # type: ignore
-    __commands__[subcommand](**vars(args))
+
+    kwargs = vars(args) | additional
+
+    __commands__[subcommand](**kwargs)
 
 
 def override(base: dict, new: dict) -> dict:
