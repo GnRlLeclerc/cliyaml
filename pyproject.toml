@@ -1,6 +1,6 @@
 [project]
 name = "cliyaml"
-version = "0.1.1"
+version = "0.1.2"
 description = "Prototype projects fast with YAML configuration"
 authors = [{ name = "Thibaut de Saivre", email = "thibaut2saivre@gmail.com" }]
 readme = "README.md"
