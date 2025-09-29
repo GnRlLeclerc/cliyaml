@@ -2,7 +2,7 @@
 
 import inspect
 from argparse import ArgumentParser
-from typing import Any, Callable, ParamSpec, TypeVar
+from typing import Any, Callable, TypeVar
 
 from cliyaml.cli import add_to_parser
 from cliyaml.parse import Tree, parse_description, parse_lines, to_dict
@@ -134,11 +134,10 @@ def handle():
     __commands__[subcommand](**kwargs)
 
 
-P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def call(func: Callable[P, R], d: dict, *args: P.args, **kwargs: P.kwargs) -> R:
+def call(func: Callable[..., R], d: dict, *args, **kwargs) -> R:
     """Call a function with the exact arguments it needs from a dict.
     Arguments can be manually specified as well."""
     merged = d | kwargs
