@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from typing import Any, Callable, TypeVar
 
 from cliyaml.cli import add_to_parser
-from cliyaml.parse import Tree, parse_description, parse_lines, to_dict
+from cliyaml.parse import Tree, parse_lines, to_dict
 from cliyaml.source import source
 
 # Registered commands
@@ -56,13 +56,11 @@ def subcommand(*files: str):
     """Register a function as a subcommand, with config taken from the specified file"""
 
     tree: Tree = {}
-    description = ""
 
     for file in files:
         with open(file, "r") as f:
             lines = f.readlines()
 
-        description = parse_description(lines)
         new_tree, _ = parse_lines(lines)
 
         if not tree:
@@ -71,6 +69,7 @@ def subcommand(*files: str):
             tree = _merge_trees(tree, new_tree)
 
     def decorator(func):
+        description = func.__doc__
         if __parser__ is None:
             raise ValueError(
                 "Call `cliyaml.initialize` before registering subcommands with the `subcommand` decorator"

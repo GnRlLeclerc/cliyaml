@@ -114,18 +114,6 @@ def parse_lines(lines: list[str], indent=0, offset=0) -> tuple[Tree, int]:
     return data, offset
 
 
-def parse_description(lines: list[str]) -> str:
-    """Parse the description from the top comments of the file."""
-    description_lines = []
-    for line in lines:
-        line = line.strip()
-        if line.startswith("#"):
-            description_lines.append(line[1:].strip())
-        else:
-            break
-    return "\n".join(description_lines)
-
-
 def to_dict(tree: Tree, prefix="") -> dict:
     """Convert a Tree to a flattened directory."""
 
