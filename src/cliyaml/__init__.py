@@ -76,8 +76,10 @@ def subcommand(*files: str):
                 "Call `cliyaml.initialize` before registering subcommands with the `subcommand` decorator"
             )
 
-        __commands__[func.__name__] = func
-        parser = __subparser__.add_parser(func.__name__, help=description)
+        name = func.__name__.replace("_", "-")
+
+        __commands__[name] = func
+        parser = __subparser__.add_parser(name, help=description)
         add_to_parser(parser, tree)
         parser.add_argument(
             "-c",
